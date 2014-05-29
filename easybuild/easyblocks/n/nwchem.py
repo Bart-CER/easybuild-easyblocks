@@ -59,7 +59,8 @@ class EB_NWChem(ConfigureMake):
                       ('target', ["LINUX64", "Target platform", CUSTOM]),
                       # possible options for ARMCI_NETWORK on LINUX64 with Infiniband:
                       # OPENIB, MPI-MT, MPI-SPAWN, MELLANOX
-                      ('armci_network', ["OPENIB", "Network protocol to use", CUSTOM]),
+                      #('armci_network', ["OPENIB", "Network protocol to use", CUSTOM]),
+                      ('armci_network', ["MELLANOX", "Network protocol to use", CUSTOM]),
                       ('msg_comms', ["MPI", "Type of message communication", CUSTOM]),
                       ('modules', ["all", "NWChem modules to build", CUSTOM]),
                       ('lib_defines', ["", "Additional defines for C preprocessor", CUSTOM]),
@@ -101,10 +102,15 @@ class EB_NWChem(ConfigureMake):
         env.setvar('NWCHEM_TARGET', self.cfg['target'])
         env.setvar('MSG_COMMS', self.cfg['msg_comms'])
         env.setvar('ARMCI_NETWORK', self.cfg['armci_network'])
+        print "USING THE RIGHT ONE"
         if self.cfg['armci_network'] in ["OPENIB"]:
             env.setvar('IB_INCLUDE', "/usr/include")
             env.setvar('IB_LIB', "/usr/lib64")
             env.setvar('IB_LIB_NAME', "-libumad -libverbs -lpthread")
+        if self.cfg['armci_network'] in ["MELLANOX"]:
+            env.setvar('IB_INCLUDE', "/usr/include/infiniband")
+            env.setvar('IB_LIB', "/usr/lib64")
+            env.setvar('IB_LIB_NAME', "-libibumad -libibverbs -lpthread")
 
         if 'python' in self.cfg['modules']:
             python_root = get_software_root('Python')
