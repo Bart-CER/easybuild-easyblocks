@@ -102,11 +102,14 @@ class EB_NWChem(ConfigureMake):
         env.setvar('NWCHEM_TARGET', self.cfg['target'])
         env.setvar('MSG_COMMS', self.cfg['msg_comms'])
         env.setvar('ARMCI_NETWORK', self.cfg['armci_network'])
-        print "USING THE RIGHT ONE"
+        print "USING THE RIGHT ONE",self.cfg['armci_network']
         if self.cfg['armci_network'] in ["OPENIB"]:
-            env.setvar('IB_INCLUDE', "/usr/include")
+            env.setvar('IB_INCLUDE', "/usr/include/infiniband")
             env.setvar('IB_LIB', "/usr/lib64")
-            env.setvar('IB_LIB_NAME', "-libumad -libverbs -lpthread")
+            env.setvar('IB_LIB_NAME', "-libibumad -libibverbs -lpthread")
+            #env.setvar('IB_INCLUDE', "/usr/include")
+            #env.setvar('IB_LIB', "/usr/lib64")
+            #env.setvar('IB_LIB_NAME', "-libumad -libverbs -lpthread")
         if self.cfg['armci_network'] in ["MELLANOX"]:
             env.setvar('IB_INCLUDE', "/usr/include/infiniband")
             env.setvar('IB_LIB', "/usr/lib64")
