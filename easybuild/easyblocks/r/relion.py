@@ -35,6 +35,7 @@ EasyBuild support for BiSearch, implemented as an easyblock
 import os
 
 from easybuild.framework.easyblock import EasyBlock
+from easybuild.tools.filetools import run_cmd
 
 
 class EB_Relion(EasyBlock):
@@ -52,16 +53,20 @@ class EB_Relion(EasyBlock):
         pass
 
     def install_step(self):
-        cmd = "./install.sh"
+        os.chdir("relion-1.2")
+        
+        cmd="sed -i.b 's/PREFIX=$RELION_HOME/PREFIX=%s/' INSTALL.sh " % self.installdir.replace("/","\/")
+        run_cmd(cmd, log_all=True, simple=True)
 
+        cmd = "./INSTALL.sh"
         run_cmd(cmd, log_all=True, simple=True)
 
     def sanity_check_step(self):
-        """Custom sanity check for BiSearch."""
+        """Custom sanity check."""
 
         custom_paths = {
                         'files':[],
-                        'dirs':[]
+                        'dirs':['bin','lib','include']
                        }
 
-        super(EB_BiSearch, self).sanity_check_step(custom_paths=custom_paths)
+        super(EB_Relion, self).sanity_check_step(custom_paths=custom_paths)
