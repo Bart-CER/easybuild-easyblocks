@@ -120,8 +120,11 @@ class EB_OpenFOAM(EasyBlock):
         # parallel build spec
         env.setvar("WM_NCOMPPROCS", str(self.cfg['parallel']))
 
-        if 'extend' in self.name.lower() and LooseVersion(self.version) >= LooseVersion('3.0'):
-            self.openfoamdir = 'foam-extend-%s' % self.version
+        if 'extend' in self.name.lower():
+            if LooseVersion(self.version) >= LooseVersion('3.0'):
+                self.openfoamdir = 'foam-extend-%s' % self.version
+            else:
+                self.openfoamdir = 'OpenFOAM-%s-ext' % self.version
         else:
             self.openfoamdir = '-'.join([self.name, '-'.join(self.version.split('-')[:2])])
         self.log.debug("openfoamdir: %s" % self.openfoamdir)
@@ -161,9 +164,9 @@ class EB_OpenFOAM(EasyBlock):
                 "warning.*",
                 "configure: creating.*",
                 "%s .*" % os.environ['CC'],
+                "wmake .*",
             ]
-            #run_cmd_qa(cmd_tmpl % 'Allwmake.firstInstall', qa, no_qa=noqa, log_all=True, simple=True)
-            run_cmd(cmd_tmpl % 'Allwmake.firstInstall', inp="Y\nY\n", log_all=True, simple=True, log_output=True)
+            run_cmd_qa(cmd_tmpl % 'Allwmake.firstInstall', qa, no_qa=noqa, log_all=True, simple=True)
         else:
             run_cmd(cmd_tmpl % 'Allwmake', log_all=True, simple=True, log_output=True)
 
@@ -205,7 +208,7 @@ class EB_OpenFOAM(EasyBlock):
                [os.path.join(toolsdir, "surface%s" % x) for x in ["Add", "Find", "Smooth"]] + \
                [os.path.join(toolsdir, x) for x in ["deformedGeom", "engineSwirl", "modifyMesh",
                                                     "refineMesh", "vorticity"]]
-        if LooseVersion(self.version) >= LooseVersion("2.3.0"):
+        if not 'extend' in self.name.lower() and LooseVersion(self.version) >= LooseVersion("2.3.0"):
             # surfaceSmooth is replaced by surfaceLambdaMuSmooth is OpenFOAM v2.3.0
             bins.remove(os.path.join(toolsdir, "surfaceSmooth"))
             bins.append(os.path.join(toolsdir, "surfaceLambdaMuSmooth"))
